@@ -60,23 +60,14 @@ workflowRouter.post('/validate', (req, res) => {
                     if (!node.type) errors.push(`nodes[${index}]: type is required`);
                 });
 
-                // Check connections reference valid node IDs or indices
-                const nodeIds = new Set(workflow.nodes.map(n => n.id).filter(Boolean));
+                // Check connections are valid indices
                 const nodeCount = workflow.nodes.length;
                 (workflow.connections || []).forEach((conn, index) => {
-                    // Support both index-based and id-based connections
-                    const fromValid = typeof conn.from === 'number'
-                        ? conn.from >= 0 && conn.from < nodeCount
-                        : nodeIds.has(conn.from);
-                    const toValid = typeof conn.to === 'number'
-                        ? conn.to >= 0 && conn.to < nodeCount
-                        : nodeIds.has(conn.to);
-
-                    if (!fromValid) {
-                        errors.push(`connections[${index}]: 'from' references invalid node '${conn.from}'`);
+                    if (typeof conn.from !== 'number' || conn.from < 0 || conn.from >= nodeCount) {
+                        errors.push(`connections[${index}]: 'from' must be a valid node index (0-${nodeCount - 1})`);
                     }
-                    if (!toValid) {
-                        errors.push(`connections[${index}]: 'to' references invalid node '${conn.to}'`);
+                    if (typeof conn.to !== 'number' || conn.to < 0 || conn.to >= nodeCount) {
+                        errors.push(`connections[${index}]: 'to' must be a valid node index (0-${nodeCount - 1})`);
                     }
                 });
             }
