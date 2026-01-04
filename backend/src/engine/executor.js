@@ -24,21 +24,18 @@ export async function executeWorkflow(workflow, triggerPayload = {}) {
     const flowStore = new FlowStore();
     const { nodes, connections, onError = 'stop' } = workflow;
 
-    // Auto-generate IDs for nodes that don't have them
-    const idMap = new Map(); // Maps original index to generated ID
+    const idMap = new Map();
     const processedNodes = nodes.map((node, index) => {
         const generatedId = node.id || `${node.type}-${randomUUID().slice(0, 8)}`;
         idMap.set(index, generatedId);
         return { ...node, id: generatedId };
     });
 
-    // Update connections to use generated IDs (supports index-based connections)
     const processedConnections = (connections || []).map(conn => ({
         from: typeof conn.from === 'number' ? idMap.get(conn.from) : conn.from,
         to: typeof conn.to === 'number' ? idMap.get(conn.to) : conn.to
     }));
 
-    // Build execution order from connections (topological sort)
     const executionOrder = buildExecutionOrder(processedNodes, processedConnections);
 
     const executionLog = {
@@ -119,8 +116,13 @@ function buildExecutionOrder(nodes, connections) {
 
     // Build graph
     for (const conn of connections || []) {
-        adjacency.get(conn.from).push(conn.to);
-        inDegree.set(conn.to, (inDegree.get(conn.to) || 0) + 1);
+        const fromAdj = adjacency.get(conn.from);
+        if (fromAdj) {
+            fromAdj.push(conn.to);
+        }
+        if (inDegree.has(conn.to)) {
+            inDegree.set(conn.to, inDegree.get(conn.to) + 1);
+        }
     }
 
     // Kahn's algorithm

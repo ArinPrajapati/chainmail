@@ -55,20 +55,28 @@ workflowRouter.post('/validate', (req, res) => {
             if (!workflow.nodes || !Array.isArray(workflow.nodes)) {
                 errors.push('workflow.nodes must be an array');
             } else {
-                // Check each node has required fields
+                // Check each node has required fields (id is optional, auto-generated)
                 workflow.nodes.forEach((node, index) => {
-                    if (!node.id) errors.push(`nodes[${index}]: id is required`);
                     if (!node.type) errors.push(`nodes[${index}]: type is required`);
                 });
 
-                // Check connections reference valid node IDs
-                const nodeIds = new Set(workflow.nodes.map(n => n.id));
+                // Check connections reference valid node IDs or indices
+                const nodeIds = new Set(workflow.nodes.map(n => n.id).filter(Boolean));
+                const nodeCount = workflow.nodes.length;
                 (workflow.connections || []).forEach((conn, index) => {
-                    if (!nodeIds.has(conn.from)) {
-                        errors.push(`connections[${index}]: 'from' references unknown node '${conn.from}'`);
+                    // Support both index-based and id-based connections
+                    const fromValid = typeof conn.from === 'number'
+                        ? conn.from >= 0 && conn.from < nodeCount
+                        : nodeIds.has(conn.from);
+                    const toValid = typeof conn.to === 'number'
+                        ? conn.to >= 0 && conn.to < nodeCount
+                        : nodeIds.has(conn.to);
+
+                    if (!fromValid) {
+                        errors.push(`connections[${index}]: 'from' references invalid node '${conn.from}'`);
                     }
-                    if (!nodeIds.has(conn.to)) {
-                        errors.push(`connections[${index}]: 'to' references unknown node '${conn.to}'`);
+                    if (!toValid) {
+                        errors.push(`connections[${index}]: 'to' references invalid node '${conn.to}'`);
                     }
                 });
             }
