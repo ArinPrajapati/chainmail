@@ -4,6 +4,7 @@
  */
 
 import express from 'express';
+import cors from 'cors';
 import { workflowRouter } from './routes/workflowRoutes.js';
 
 // Register all node types
@@ -23,6 +24,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 
 // Routes
