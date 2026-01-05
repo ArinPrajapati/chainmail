@@ -2,20 +2,17 @@
  * TriggerNode - Entry point for workflow execution
  */
 
-import { Handle, Position } from '@xyflow/react';
+import BaseNode from './BaseNode';
 
-function TriggerNode({ data, selected }) {
+function TriggerNode({ selected }) {
     return (
-        <div className={`node trigger-node ${selected ? 'selected' : ''}`}>
-            <div className="node-header">
-                <span className="node-icon">⚡</span>
-                <span className="node-title">Trigger</span>
-            </div>
-            <div className="node-body">
-                <p>Workflow entry point</p>
-            </div>
-            <Handle type="source" position={Position.Bottom} />
-        </div>
+        <BaseNode
+            type="trigger"
+            icon="⚡"
+            selected={selected}
+            inputs={[]}
+            outputs={['default']}
+        />
     );
 }
 

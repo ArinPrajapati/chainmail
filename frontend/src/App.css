@@ -242,74 +242,59 @@ body {
   background: #fecaca;
 }
 
-/* Custom Nodes */
+/* Custom Nodes - Icon Only */
 .node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
   background: white;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  min-width: 150px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.node:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .node.selected {
   border-color: #4f46e5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
 }
 
-.node-header {
+.node-icon-wrapper {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
-  border-radius: 6px 6px 0 0;
+  justify-content: center;
 }
 
 .node-icon {
-  font-size: 1rem;
+  font-size: 1.6rem;
 }
 
-.node-title {
-  font-weight: 600;
-  font-size: 0.85rem;
+/* Node type specific backgrounds */
+.trigger-node {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: #f59e0b;
 }
 
-.node-body {
-  padding: 10px 12px;
+.text-node {
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  border-color: #6366f1;
 }
 
-.node-preview {
-  font-size: 0.8rem;
-  color: #666;
-  word-break: break-word;
+.http-node {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  border-color: #10b981;
 }
 
-/* Node type specific styles */
-.trigger-node .node-header {
-  background: #fef3c7;
-}
-
-.text-node .node-header {
-  background: #e0e7ff;
-}
-
-.http-node .node-header {
-  background: #d1fae5;
-}
-
-.ai-node .node-header {
-  background: #fce7f3;
-}
-
-.http-method {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: white;
-  font-size: 0.7rem;
-  font-weight: 600;
-  margin-bottom: 4px;
+.ai-node {
+  background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+  border-color: #ec4899;
 }
 
 /* Result Panel */
@@ -322,7 +307,7 @@ body {
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   overflow: hidden;
 }
 

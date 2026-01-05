@@ -2,23 +2,15 @@
  * TextNode - Outputs static or templated text
  */
 
-import { Handle, Position } from '@xyflow/react';
+import BaseNode from './BaseNode';
 
-function TextNode({ data, selected }) {
+function TextNode({ selected }) {
     return (
-        <div className={`node text-node ${selected ? 'selected' : ''}`}>
-            <div className="node-header">
-                <span className="node-icon">📝</span>
-                <span className="node-title">Text</span>
-            </div>
-            <div className="node-body">
-                <p className="node-preview">
-                    {data.text ? data.text.substring(0, 30) + (data.text.length > 30 ? '...' : '') : 'No text configured'}
-                </p>
-            </div>
-            <Handle type="target" position={Position.Top} />
-            <Handle type="source" position={Position.Bottom} />
-        </div>
+        <BaseNode
+            type="text"
+            icon="📝"
+            selected={selected}
+        />
     );
 }
 
