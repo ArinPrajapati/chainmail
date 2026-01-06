@@ -83,9 +83,9 @@ export async function executeWorkflow(workflow, triggerPayload = {}) {
  * Execute a single node
  */
 async function executeNode(node, flowStore, triggerPayload) {
-    const executor = nodeRegistry.get(node.type);
+    const nodeDef = nodeRegistry.get(node.type);
 
-    if (!executor) {
+    if (!nodeDef) {
         throw new Error(`Unknown node type: ${node.type}`);
     }
 
@@ -94,10 +94,10 @@ async function executeNode(node, flowStore, triggerPayload) {
 
     // For trigger node, merge in the trigger payload
     if (node.type === 'trigger') {
-        return executor(resolvedParams, flowStore, triggerPayload);
+        return nodeDef.execute(resolvedParams, flowStore, triggerPayload);
     }
 
-    return executor(resolvedParams, flowStore);
+    return nodeDef.execute(resolvedParams, flowStore);
 }
 
 /**

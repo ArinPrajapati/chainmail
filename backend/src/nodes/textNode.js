@@ -4,10 +4,26 @@
 
 import { createNode } from './baseNode.js';
 
-export const textNode = createNode((parameters, flowStore) => {
-    const { text = '' } = parameters;
-
-    return {
-        text: text
-    };
+export const textNode = createNode({
+    meta: {
+        type: 'text',
+        label: 'Text',
+        icon: '📝',
+        description: 'Static or templated text',
+        inputs: ['default'],
+        outputs: ['default'],
+        parameters: [
+            {
+                name: 'text',
+                type: 'textarea',
+                label: 'Text Content',
+                placeholder: 'Enter text or use {{nodeId.field}} for templating',
+                default: ''
+            }
+        ]
+    },
+    execute: (parameters, flowStore) => {
+        const { text = '' } = parameters;
+        return { text };
+    }
 });

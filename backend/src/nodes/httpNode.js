@@ -4,53 +4,91 @@
 
 import { createNode } from './baseNode.js';
 
-export const httpNode = createNode(async (parameters, flowStore) => {
-    const {
-        method = 'GET',
-        url,
-        headers = {},
-        body = null
-    } = parameters;
+export const httpNode = createNode({
+    meta: {
+        type: 'http',
+        label: 'HTTP Request',
+        icon: '🌐',
+        description: 'Make HTTP requests',
+        inputs: ['default'],
+        outputs: ['default'],
+        parameters: [
+            {
+                name: 'method',
+                type: 'select',
+                label: 'Method',
+                default: 'GET',
+                options: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+            },
+            {
+                name: 'url',
+                type: 'text',
+                label: 'URL',
+                placeholder: 'https://api.example.com/data',
+                required: true
+            },
+            {
+                name: 'headers',
+                type: 'json',
+                label: 'Headers (JSON)',
+                default: '{}'
+            },
+            {
+                name: 'body',
+                type: 'textarea',
+                label: 'Body',
+                placeholder: 'Request body (for POST/PUT/PATCH)'
+            }
+        ]
+    },
+    execute: async (parameters, flowStore) => {
+        const {
+            method = 'GET',
+            url,
+            headers = {},
+            body = null
+        } = parameters;
 
-    if (!url) {
-        throw new Error('HTTP Node: url is required');
-    }
-
-    const fetchOptions = {
-        method: method.toUpperCase(),
-        headers: {
-            'Content-Type': 'application/json',
-            ...headers
+        if (!url) {
+            throw new Error('HTTP Node: url is required');
         }
-    };
 
-    // Add body for methods that support it
-    if (body && !['GET', 'HEAD'].includes(fetchOptions.method)) {
-        fetchOptions.body = typeof body === 'string' ? body : JSON.stringify(body);
+        const fetchOptions = {
+            method: method.toUpperCase(),
+            headers: {
+                'Content-Type': 'application/json',
+                ...headers
+            }
+        };
+
+        // Add body for methods that support it
+        if (body && !['GET', 'HEAD'].includes(fetchOptions.method)) {
+            fetchOptions.body = typeof body === 'string' ? body : JSON.stringify(body);
+        }
+
+        const response = await fetch(url, fetchOptions);
+
+        const responseData = {
+            status: response.status,
+            statusText: response.statusText,
+            headers: Object.fromEntries(response.headers.entries())
+        };
+
+        // Try to parse as JSON, fall back to text
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+            responseData.data = await response.json();
+        } else {
+            responseData.data = await response.text();
+        }
+
+        // Throw error for non-2xx responses (can be caught by executor's error handling)
+        if (!response.ok) {
+            const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
+            error.response = responseData;
+            throw error;
+        }
+
+        return responseData;
     }
-
-    const response = await fetch(url, fetchOptions);
-
-    const responseData = {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries())
-    };
-
-    // Try to parse as JSON, fall back to text
-    const contentType = response.headers.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-        responseData.data = await response.json();
-    } else {
-        responseData.data = await response.text();
-    }
-
-    // Throw error for non-2xx responses (can be caught by executor's error handling)
-    if (!response.ok) {
-        const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
-        error.response = responseData;
-        throw error;
-    }
-
-    return responseData;
 });
