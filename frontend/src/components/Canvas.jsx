@@ -1,26 +1,20 @@
 /**
  * Canvas - Main ReactFlow workflow canvas
+ * Now uses dynamic node types from backend API
  */
 
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect, useMemo } from 'react';
 import { ReactFlow, Background, Controls, MiniMap } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import useWorkflowStore from '../store/workflowStore';
-import TriggerNode from './nodes/TriggerNode';
-import TextNode from './nodes/TextNode';
-import HttpNode from './nodes/HttpNode';
-import AiNode from './nodes/AiNode';
-
-// Register custom node types
-const nodeTypes = {
-    trigger: TriggerNode,
-    text: TextNode,
-    http: HttpNode,
-    ai: AiNode,
-};
+import DynamicNode from './nodes/DynamicNode';
+import { fetchNodeDefinitions } from '../services/nodeDefinitions';
 
 function Canvas() {
+    const [nodeDefinitions, setNodeDefinitions] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
     const {
         nodes,
         edges,
@@ -30,6 +24,28 @@ function Canvas() {
         setSelectedNode,
         addNode,
     } = useWorkflowStore();
+
+    // Fetch node definitions on mount
+    useEffect(() => {
+        fetchNodeDefinitions()
+            .then(defs => {
+                setNodeDefinitions(defs);
+                setIsLoading(false);
+            })
+            .catch(err => {
+                console.error('Failed to load node definitions:', err);
+                setIsLoading(false);
+            });
+    }, []);
+
+    // Build nodeTypes object dynamically - all types use DynamicNode
+    const nodeTypes = useMemo(() => {
+        const types = {};
+        nodeDefinitions.forEach(def => {
+            types[def.type] = DynamicNode;
+        });
+        return types;
+    }, [nodeDefinitions]);
 
     const onNodeClick = useCallback((event, node) => {
         setSelectedNode(node.id);
@@ -59,6 +75,14 @@ function Canvas() {
         event.dataTransfer.dropEffect = 'move';
     }, []);
 
+    if (isLoading) {
+        return (
+            <div className="canvas-container">
+                <div className="loading">Loading node types...</div>
+            </div>
+        );
+    }
+
     return (
         <div className="canvas-container">
             <ReactFlow
@@ -84,3 +108,4 @@ function Canvas() {
 }
 
 export default Canvas;
+

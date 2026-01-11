@@ -103,10 +103,8 @@ async function executeNode(node, flowStore, triggerPayload) {
         throw new Error(`Unknown node type: ${node.type}`);
     }
 
-    // Resolve templates in parameters
     const resolvedParams = resolveTemplates(node.parameters || {}, flowStore);
 
-    // For trigger node, merge in the trigger payload
     if (node.type === 'trigger') {
         return nodeDef.execute(resolvedParams, flowStore, triggerPayload);
     }

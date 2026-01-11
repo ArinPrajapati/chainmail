@@ -1,22 +1,33 @@
 /**
  * NodePalette - Sidebar with available node types
+ * Now fetches from backend API
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useWorkflowStore from '../store/workflowStore';
-
-const NODE_TYPES = [
-    { type: 'trigger', icon: '⚡', label: 'Trigger', description: 'Workflow entry point' },
-    { type: 'text', icon: '📝', label: 'Text', description: 'Static or templated text' },
-    { type: 'http', icon: '🌐', label: 'HTTP', description: 'Make HTTP requests' },
-    { type: 'ai', icon: '🤖', label: 'AI', description: 'Send prompt to LLM' },
-];
+import { fetchNodeDefinitions } from '../services/nodeDefinitions';
+import NodeIcon from './NodeIcon';
 
 function NodePalette() {
     const [search, setSearch] = useState('');
+    const [nodeTypes, setNodeTypes] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const addNode = useWorkflowStore((state) => state.addNode);
 
-    const filteredNodes = NODE_TYPES.filter(
+    // Fetch node definitions on mount
+    useEffect(() => {
+        fetchNodeDefinitions()
+            .then(defs => {
+                setNodeTypes(defs);
+                setIsLoading(false);
+            })
+            .catch(err => {
+                console.error('Failed to load node types:', err);
+                setIsLoading(false);
+            });
+    }, []);
+
+    const filteredNodes = nodeTypes.filter(
         (node) =>
             node.label.toLowerCase().includes(search.toLowerCase()) ||
             node.description.toLowerCase().includes(search.toLowerCase())
@@ -43,23 +54,31 @@ function NodePalette() {
                 className="search-input"
             />
             <div className="node-list">
-                {filteredNodes.map((node) => (
-                    <div
-                        key={node.type}
-                        className="palette-node"
-                        draggable
-                        onDragStart={(e) => onDragStart(e, node.type)}
-                        onClick={() => handleClick(node.type)}
-                    >
-                        <span className="palette-icon">{node.icon}</span>
-                        <div className="palette-info">
-                            <span className="palette-label">{node.label}</span>
-                            <span className="palette-desc">{node.description}</span>
-                        </div>
-                    </div>
-                ))}
-                {filteredNodes.length === 0 && (
-                    <p className="no-results">No nodes found</p>
+                {isLoading ? (
+                    <p className="loading-text">Loading...</p>
+                ) : (
+                    <>
+                        {filteredNodes.map((node) => (
+                            <div
+                                key={node.type}
+                                className="palette-node"
+                                draggable
+                                onDragStart={(e) => onDragStart(e, node.type)}
+                                onClick={() => handleClick(node.type)}
+                            >
+                                <span className="palette-icon">
+                                    <NodeIcon name={node.icon} size={20} />
+                                </span>
+                                <div className="palette-info">
+                                    <span className="palette-label">{node.label}</span>
+                                    <span className="palette-desc">{node.description}</span>
+                                </div>
+                            </div>
+                        ))}
+                        {filteredNodes.length === 0 && (
+                            <p className="no-results">No nodes found</p>
+                        )}
+                    </>
                 )}
             </div>
         </div>
@@ -67,3 +86,4 @@ function NodePalette() {
 }
 
 export default NodePalette;
+

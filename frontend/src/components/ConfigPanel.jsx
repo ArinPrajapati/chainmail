@@ -1,8 +1,12 @@
 /**
  * ConfigPanel - Edit selected node parameters
+ * Now renders fields dynamically based on backend node definitions
  */
 
 import useWorkflowStore from '../store/workflowStore';
+import DynamicField from './DynamicField';
+import NodeIcon from './NodeIcon';
+import { getNodeDefinition } from '../services/nodeDefinitions';
 
 function ConfigPanel() {
     const selectedNodeId = useWorkflowStore((state) => state.selectedNodeId);
@@ -21,6 +25,9 @@ function ConfigPanel() {
         );
     }
 
+    // Get node definition from cache
+    const nodeDef = getNodeDefinition(selectedNode.type);
+
     const handleChange = (field, value) => {
         updateNode(selectedNodeId, { [field]: value });
     };
@@ -31,81 +38,31 @@ function ConfigPanel() {
 
     return (
         <div className="config-panel">
-            <h3>Configure {selectedNode.type}</h3>
+            <h3>
+                <NodeIcon name={nodeDef?.icon} size={20} />
+                {' '}{nodeDef?.label || selectedNode.type}
+            </h3>
 
             <div className="config-form">
-                {selectedNode.type === 'trigger' && (
-                    <p className="config-info">Trigger node receives the initial payload.</p>
+                {/* Show description if available */}
+                {nodeDef?.description && (
+                    <p className="config-info">{nodeDef.description}</p>
                 )}
 
-                {selectedNode.type === 'text' && (
-                    <div className="form-group">
-                        <label>Text Content</label>
-                        <textarea
-                            value={selectedNode.data.text || ''}
-                            onChange={(e) => handleChange('text', e.target.value)}
-                            placeholder="Enter text or use {{nodeId.field}} for templating"
-                            rows={4}
-                        />
-                    </div>
+                {/* No parameters message */}
+                {(!nodeDef?.parameters || nodeDef.parameters.length === 0) && (
+                    <p className="config-info">No configuration required.</p>
                 )}
 
-                {selectedNode.type === 'http' && (
-                    <>
-                        <div className="form-group">
-                            <label>Method</label>
-                            <select
-                                value={selectedNode.data.method || 'GET'}
-                                onChange={(e) => handleChange('method', e.target.value)}
-                            >
-                                <option value="GET">GET</option>
-                                <option value="POST">POST</option>
-                                <option value="PUT">PUT</option>
-                                <option value="DELETE">DELETE</option>
-                                <option value="PATCH">PATCH</option>
-                            </select>
-                        </div>
-                        <div className="form-group">
-                            <label>URL</label>
-                            <input
-                                type="text"
-                                value={selectedNode.data.url || ''}
-                                onChange={(e) => handleChange('url', e.target.value)}
-                                placeholder="https://api.example.com/data"
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Headers (JSON)</label>
-                            <textarea
-                                value={selectedNode.data.headers || '{}'}
-                                onChange={(e) => handleChange('headers', e.target.value)}
-                                placeholder='{"Content-Type": "application/json"}'
-                                rows={2}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Body</label>
-                            <textarea
-                                value={selectedNode.data.body || ''}
-                                onChange={(e) => handleChange('body', e.target.value)}
-                                placeholder="Request body (for POST/PUT/PATCH)"
-                                rows={3}
-                            />
-                        </div>
-                    </>
-                )}
-
-                {selectedNode.type === 'ai' && (
-                    <div className="form-group">
-                        <label>Prompt</label>
-                        <textarea
-                            value={selectedNode.data.prompt || ''}
-                            onChange={(e) => handleChange('prompt', e.target.value)}
-                            placeholder="Enter prompt or use {{lastResult}} for previous output"
-                            rows={4}
-                        />
-                    </div>
-                )}
+                {/* Dynamically render fields based on node definition */}
+                {nodeDef?.parameters?.map(param => (
+                    <DynamicField
+                        key={param.name}
+                        param={param}
+                        value={selectedNode.data[param.name]}
+                        onChange={(val) => handleChange(param.name, val)}
+                    />
+                ))}
 
                 <button className="delete-btn" onClick={handleDelete}>
                     Delete Node
@@ -116,3 +73,4 @@ function ConfigPanel() {
 }
 
 export default ConfigPanel;
+

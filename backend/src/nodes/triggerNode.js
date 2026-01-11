@@ -8,7 +8,7 @@ export const triggerNode = createNode({
     meta: {
         type: 'trigger',
         label: 'Trigger',
-        icon: '⚡',
+        icon: 'Zap',
         description: 'Workflow entry point',
         inputs: [],  // No inputs - this is the start
         outputs: ['default'],

@@ -28,6 +28,7 @@
  */
 
 import { Handle, Position } from '@xyflow/react';
+import NodeIcon from '../NodeIcon';
 
 // Map string positions to Position enum
 const POSITION_MAP = {
@@ -74,7 +75,7 @@ function BaseNode({
     return (
         <div className={`node ${type}-node ${selected ? 'selected' : ''}`}>
             <div className="node-icon-wrapper">
-                <span className="node-icon">{icon}</span>
+                <NodeIcon name={icon} size={24} />
             </div>
 
             {/* Input handles */}

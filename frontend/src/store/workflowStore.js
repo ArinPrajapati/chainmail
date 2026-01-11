@@ -21,7 +21,10 @@ const useWorkflowStore = create((set, get) => ({
             id,
             type,
             position,
-            data: getDefaultData(type),
+            data: {
+                type,  // Include type in data for DynamicNode to access
+                ...getDefaultData(type)
+            },
         };
         set((state) => ({
             nodes: [...state.nodes, newNode],

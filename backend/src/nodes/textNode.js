@@ -8,7 +8,7 @@ export const textNode = createNode({
     meta: {
         type: 'text',
         label: 'Text',
-        icon: '📝',
+        icon: 'Type',
         description: 'Static or templated text',
         inputs: ['default'],
         outputs: ['default'],

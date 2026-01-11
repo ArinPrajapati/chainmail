@@ -8,7 +8,7 @@ export const httpNode = createNode({
     meta: {
         type: 'http',
         label: 'HTTP Request',
-        icon: '🌐',
+        icon: 'Globe',
         description: 'Make HTTP requests',
         inputs: ['default'],
         outputs: ['default'],

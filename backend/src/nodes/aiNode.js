@@ -9,7 +9,7 @@ export const aiNode = createNode({
     meta: {
         type: 'ai',
         label: 'AI',
-        icon: '🤖',
+        icon: 'Bot',
         description: 'Send prompt to LLM',
         inputs: ['default'],
         outputs: ['default'],

@@ -57,7 +57,6 @@ function resolveStringTemplate(str, flowStore) {
  * @returns {*} The resolved value
  */
 function resolvePath(path, flowStore) {
-    // Handle lastResult shorthand
     if (path.startsWith('lastResult')) {
         const lastResult = flowStore.getLastResult();
         if (path === 'lastResult') return lastResult;
@@ -65,10 +64,8 @@ function resolvePath(path, flowStore) {
         return getNestedValue(lastResult, subPath);
     }
 
-    // Split into nodeId and remaining path
     const dotIndex = path.indexOf('.');
     if (dotIndex === -1) {
-        // Just the nodeId, return entire result
         return flowStore.get(path);
     }
 
