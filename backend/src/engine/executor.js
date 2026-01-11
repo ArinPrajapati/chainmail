@@ -8,10 +8,24 @@ const nodeRegistry = new Map();
 /**
  * Register a node type
  * @param {string} type - Node type name
- * @param {Function} executor - Async function(parameters, flowStore) => result
+ * @param {Object} nodeDef - Node definition with { meta, execute }
  */
-export function registerNode(type, executor) {
-    nodeRegistry.set(type, executor);
+export function registerNode(type, nodeDef) {
+    nodeRegistry.set(type, nodeDef);
+}
+
+/**
+ * Get metadata for all registered node types
+ * @returns {Array} Array of node metadata objects
+ */
+export function getAllNodeMeta() {
+    const result = [];
+    for (const [type, nodeDef] of nodeRegistry) {
+        if (nodeDef.meta) {
+            result.push({ type, ...nodeDef.meta });
+        }
+    }
+    return result;
 }
 
 /**

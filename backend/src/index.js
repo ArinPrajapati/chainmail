@@ -6,6 +6,7 @@
 import express from 'express';
 import cors from 'cors';
 import { workflowRouter } from './routes/workflowRoutes.js';
+import { nodesRouter } from './routes/nodesRoutes.js';
 
 // Register all node types
 import { registerNode } from './engine/executor.js';
@@ -29,6 +30,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/workflow', workflowRouter);
+app.use('/api/nodes', nodesRouter);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -49,4 +51,5 @@ app.listen(PORT, () => {
     console.log(`🚀 Chainmail Workflow Engine running on http://localhost:${PORT}`);
     console.log(`📡 Execute workflows: POST /api/workflow/execute`);
     console.log(`✅ Validate workflows: POST /api/workflow/validate`);
+    console.log(`🔧 Node definitions: GET /api/nodes`);
 });
