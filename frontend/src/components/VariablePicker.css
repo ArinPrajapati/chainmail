@@ -1,0 +1,155 @@
+/**
+ * VariablePicker Styles
+ */
+
+.variable-picker {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-surface, #1e1e1e);
+    border: 1px solid var(--color-border, #333);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+    max-height: 300px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.variable-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--color-border, #333);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--color-text, #fff);
+}
+
+.variable-picker-header .close-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-muted, #888);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.variable-picker-header .close-btn:hover {
+    color: var(--color-text, #fff);
+}
+
+.variable-picker-content {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.variable-picker-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--color-text-muted, #888);
+    font-size: 13px;
+}
+
+.variable-node {
+    border-bottom: 1px solid var(--color-border, #333);
+}
+
+.variable-node:last-child {
+    border-bottom: none;
+}
+
+.variable-node-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.variable-node-header:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.expand-icon {
+    font-size: 10px;
+    color: var(--color-text-muted, #888);
+    width: 12px;
+}
+
+.node-label {
+    font-weight: 500;
+    color: var(--color-text, #fff);
+}
+
+.node-type {
+    font-size: 11px;
+    color: var(--color-text-muted, #888);
+}
+
+.variable-fields {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px 0;
+}
+
+.variable-field {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px 8px 32px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.variable-field:hover {
+    background: var(--color-primary, #6366f1);
+}
+
+.field-name {
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--color-accent, #22d3ee);
+}
+
+.field-type {
+    font-size: 11px;
+    color: var(--color-text-muted, #888);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.field-desc {
+    flex-basis: 100%;
+    font-size: 11px;
+    color: var(--color-text-muted, #888);
+    margin-top: 2px;
+}
+
+.variable-picker-footer {
+    padding: 8px 12px;
+    border-top: 1px solid var(--color-border, #333);
+}
+
+.insert-last {
+    width: 100%;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-border, #333);
+    border-radius: 6px;
+    color: var(--color-text, #fff);
+    font-family: monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.insert-last:hover {
+    background: var(--color-primary, #6366f1);
+}

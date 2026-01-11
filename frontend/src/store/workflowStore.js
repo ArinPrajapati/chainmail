@@ -90,8 +90,9 @@ const useWorkflowStore = create((set, get) => ({
             nodeIndexMap[node.id] = index;
         });
 
-        // Convert nodes to backend format
+        // Convert nodes to backend format - include ID so templates use correct references
         const backendNodes = nodes.map((node) => ({
+            id: node.id,  // Pass frontend ID to backend
             type: node.type,
             parameters: { ...node.data },
         }));

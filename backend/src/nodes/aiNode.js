@@ -21,7 +21,13 @@ export const aiNode = createNode({
                 placeholder: 'Enter prompt or use {{lastResult}} for previous output',
                 required: true
             }
-        ]
+        ],
+        outputSchema: {
+            fields: {
+                prompt: { type: 'string', description: 'The input prompt' },
+                response: { type: 'string', description: 'LLM response text' }
+            }
+        }
     },
     execute: async (parameters, flowStore) => {
         const { prompt } = parameters;

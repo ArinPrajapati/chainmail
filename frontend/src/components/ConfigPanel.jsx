@@ -1,16 +1,56 @@
 /**
  * ConfigPanel - Edit selected node parameters
  * Now renders fields dynamically based on backend node definitions
+ * Includes upstream node detection for variable picker
  */
 
 import useWorkflowStore from '../store/workflowStore';
 import DynamicField from './DynamicField';
 import NodeIcon from './NodeIcon';
-import { getNodeDefinition } from '../services/nodeDefinitions';
+import { getNodeDefinition, getCachedDefinitions } from '../services/nodeDefinitions';
+
+/**
+ * Get all upstream nodes for a given node by traversing edges backwards
+ */
+function getUpstreamNodes(nodeId, nodes, edges) {
+    const upstream = [];
+    const visited = new Set();
+
+    function traverse(currentId) {
+        // Find all edges where the target is currentId
+        const incomingEdges = edges.filter(e => e.target === currentId);
+
+        for (const edge of incomingEdges) {
+            if (!visited.has(edge.source)) {
+                visited.add(edge.source);
+
+                // Find the source node
+                const sourceNode = nodes.find(n => n.id === edge.source);
+                if (sourceNode) {
+                    // Get node definition for outputSchema
+                    const nodeDef = getNodeDefinition(sourceNode.type);
+                    upstream.push({
+                        id: sourceNode.id,
+                        type: sourceNode.type,
+                        label: sourceNode.data?.label || nodeDef?.label || sourceNode.type,
+                        outputSchema: nodeDef?.outputSchema
+                    });
+
+                    // Recursively get upstream nodes of this node
+                    traverse(edge.source);
+                }
+            }
+        }
+    }
+
+    traverse(nodeId);
+    return upstream;
+}
 
 function ConfigPanel() {
     const selectedNodeId = useWorkflowStore((state) => state.selectedNodeId);
     const nodes = useWorkflowStore((state) => state.nodes);
+    const edges = useWorkflowStore((state) => state.edges);
     const updateNode = useWorkflowStore((state) => state.updateNode);
     const removeNode = useWorkflowStore((state) => state.removeNode);
 
@@ -27,6 +67,9 @@ function ConfigPanel() {
 
     // Get node definition from cache
     const nodeDef = getNodeDefinition(selectedNode.type);
+
+    // Get upstream nodes for variable picker
+    const upstreamNodes = getUpstreamNodes(selectedNodeId, nodes, edges);
 
     const handleChange = (field, value) => {
         updateNode(selectedNodeId, { [field]: value });
@@ -61,6 +104,7 @@ function ConfigPanel() {
                         param={param}
                         value={selectedNode.data[param.name]}
                         onChange={(val) => handleChange(param.name, val)}
+                        upstreamNodes={upstreamNodes}
                     />
                 ))}
 
@@ -73,4 +117,3 @@ function ConfigPanel() {
 }
 
 export default ConfigPanel;
-

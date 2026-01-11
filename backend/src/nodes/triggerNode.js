@@ -12,7 +12,13 @@ export const triggerNode = createNode({
         description: 'Workflow entry point',
         inputs: [],  // No inputs - this is the start
         outputs: ['default'],
-        parameters: []  // Trigger receives payload at runtime
+        parameters: [],  // Trigger receives payload at runtime
+        outputSchema: {
+            description: 'Contains the trigger payload data',
+            fields: {
+                '*': { type: 'any', description: 'Dynamic trigger payload fields' }
+            }
+        }
     },
     execute: (parameters, flowStore, triggerPayload) => {
         // Merge any static parameters with the trigger payload

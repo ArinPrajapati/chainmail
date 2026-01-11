@@ -348,3 +348,39 @@ body {
   color: #dc2626;
   font-size: 0.9rem;
 }
+
+/* Variable Picker Button */
+.field-with-picker {
+  position: relative;
+}
+
+.input-row {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.input-row input,
+.input-row textarea {
+  flex: 1;
+}
+
+.variable-btn {
+  padding: 8px 10px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6366f1;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.variable-btn:hover {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: white;
+}

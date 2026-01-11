@@ -2,13 +2,72 @@
  * DynamicField - Renders appropriate input based on parameter type
  * 
  * Supports: text, textarea, select, number, json, checkbox
+ * Includes variable picker button for templatable fields
  */
 
-function DynamicField({ param, value, onChange }) {
+import { useState, useRef } from 'react';
+import VariablePicker from './VariablePicker';
+
+function DynamicField({ param, value, onChange, upstreamNodes }) {
+    const [showPicker, setShowPicker] = useState(false);
+    const inputRef = useRef(null);
+
     const handleChange = (e) => {
         const newValue = param.type === 'checkbox' ? e.target.checked : e.target.value;
         onChange(newValue);
     };
+
+    const handleInsertVariable = (template) => {
+        const input = inputRef.current;
+        if (!input) {
+            // Just append if no input ref
+            onChange((value || '') + template);
+            return;
+        }
+
+        // Insert at cursor position
+        const start = input.selectionStart || 0;
+        const end = input.selectionEnd || 0;
+        const currentValue = value || '';
+        const newValue = currentValue.slice(0, start) + template + currentValue.slice(end);
+        onChange(newValue);
+
+        // Restore focus and cursor position after insert
+        setTimeout(() => {
+            input.focus();
+            const newCursor = start + template.length;
+            input.setSelectionRange(newCursor, newCursor);
+        }, 0);
+    };
+
+    // Variable picker button for templatable fields
+    const VariableButton = () => (
+        <button
+            type="button"
+            className="variable-btn"
+            onClick={() => setShowPicker(!showPicker)}
+            title="Insert variable"
+        >
+            {'{x}'}
+        </button>
+    );
+
+    // Wrapper with variable picker for text-like inputs
+    const withVariablePicker = (input) => (
+        <div className="field-with-picker">
+            <div className="input-row">
+                {input}
+                <VariableButton />
+            </div>
+            {showPicker && (
+                <VariablePicker
+                    upstreamNodes={upstreamNodes}
+                    onInsert={handleInsertVariable}
+                    onClose={() => setShowPicker(false)}
+                />
+            )}
+        </div>
+    );
 
     switch (param.type) {
         case 'select':
@@ -31,12 +90,15 @@ function DynamicField({ param, value, onChange }) {
             return (
                 <div className="form-group">
                     <label>{param.label}</label>
-                    <textarea
-                        value={value ?? param.default ?? ''}
-                        onChange={handleChange}
-                        placeholder={param.placeholder || ''}
-                        rows={param.type === 'json' ? 3 : 4}
-                    />
+                    {withVariablePicker(
+                        <textarea
+                            ref={inputRef}
+                            value={value ?? param.default ?? ''}
+                            onChange={handleChange}
+                            placeholder={param.placeholder || ''}
+                            rows={param.type === 'json' ? 3 : 4}
+                        />
+                    )}
                 </div>
             );
 
@@ -72,12 +134,15 @@ function DynamicField({ param, value, onChange }) {
             return (
                 <div className="form-group">
                     <label>{param.label}</label>
-                    <input
-                        type="text"
-                        value={value ?? param.default ?? ''}
-                        onChange={handleChange}
-                        placeholder={param.placeholder || ''}
-                    />
+                    {withVariablePicker(
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            value={value ?? param.default ?? ''}
+                            onChange={handleChange}
+                            placeholder={param.placeholder || ''}
+                        />
+                    )}
                 </div>
             );
     }

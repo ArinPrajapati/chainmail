@@ -20,7 +20,12 @@ export const textNode = createNode({
                 placeholder: 'Enter text or use {{nodeId.field}} for templating',
                 default: ''
             }
-        ]
+        ],
+        outputSchema: {
+            fields: {
+                text: { type: 'string', description: 'The text content' }
+            }
+        }
     },
     execute: (parameters, flowStore) => {
         const { text = '' } = parameters;

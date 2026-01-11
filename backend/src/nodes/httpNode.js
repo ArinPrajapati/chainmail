@@ -39,7 +39,15 @@ export const httpNode = createNode({
                 label: 'Body',
                 placeholder: 'Request body (for POST/PUT/PATCH)'
             }
-        ]
+        ],
+        outputSchema: {
+            fields: {
+                status: { type: 'number', description: 'HTTP status code' },
+                statusText: { type: 'string', description: 'HTTP status text' },
+                headers: { type: 'object', description: 'Response headers' },
+                data: { type: 'any', description: 'Response body (JSON or text)' }
+            }
+        }
     },
     execute: async (parameters, flowStore) => {
         const {
